@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "455817728848",
+    "project_id": "valorant-matches",
+    "storage_bucket": "valorant-matches.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455817728848:android:b62e0d9c65155d100a1255",
+        "android_client_info": {
+          "package_name": "com.eslirodrigues.valorantmatches"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "455817728848-b7pk3av9g9gojcfukumoq2aaqtvddp1l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFYVfHGTkKuJ5WJ-JjqTVW8hnvM0XVLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "455817728848-b7pk3av9g9gojcfukumoq2aaqtvddp1l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
