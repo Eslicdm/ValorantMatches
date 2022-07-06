@@ -12,5 +12,6 @@ class MatchesApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Firebase.database.setPersistenceEnabled(true)
+        Firebase.messaging.subscribeToTopic("valorantmatches")
     }
 }
