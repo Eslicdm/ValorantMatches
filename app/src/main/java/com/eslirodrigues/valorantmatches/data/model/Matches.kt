@@ -8,5 +8,6 @@ data class Matches(
     val nameTeamB: String = "",
     val imgTeamB: String = "",
     val scoreTeamB: String = "",
-    val matchTime: String = "",
+    val matchDay: String = "",
+    val matchTime: String = ""
 )

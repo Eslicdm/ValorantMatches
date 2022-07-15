@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.eslirodrigues.valorantmatches.R
 import com.eslirodrigues.valorantmatches.data.model.Matches
@@ -19,8 +20,8 @@ import com.eslirodrigues.valorantmatches.data.model.Matches
 fun MatchesListItem(match: Matches) {
     var isRevealed by remember { mutableStateOf(false) }
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-        Text(text = match.matchTime)
+    Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+        Text(text = if (match.matchTime.isEmpty()) match.matchDay else "${match.matchDay} \n ${match.matchTime}")
         AsyncImage(
             model = match.imgTeamA,
             contentDescription = match.nameTeamA

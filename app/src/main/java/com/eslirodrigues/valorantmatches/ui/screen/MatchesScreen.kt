@@ -42,23 +42,24 @@ fun MatchScreen(
         }
     ) {
         Column(modifier = Modifier.padding(it), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = {
-                val reference = Firebase.database.getReference("matches")
-                val matchId = reference.push().key!!
-                val match = Matches(
-                    id = matchId,
-                    nameTeamA = "Loud",
-                    imgTeamA = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644060140569_LOUDGreen.png",
-                    scoreTeamA = "3",
-                    nameTeamB = "Ninjas in Pyjamas",
-                    imgTeamB = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2FNIPLogo.png",
-                    scoreTeamB = "0",
-                    matchTime = "June 26"
-                )
-                reference.child(matchId).setValue(match)
-            }) {
-                Text(text = "Add")
-            }
+//            Button(onClick = {
+//                val reference = Firebase.database.getReference("matches")
+//                val matchId = reference.push().key!!
+//                val match = Matches(
+//                    id = matchId,
+//                    nameTeamA = "XIA",
+//                    imgTeamA = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644381233726_XERXIAPINK.png",
+//                    scoreTeamA = "0",
+//                    nameTeamB = "FPX",
+//                    imgTeamB = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644542485597_download38.png",
+//                    scoreTeamB = "0",
+//                    matchDay = "July 11",
+//                    matchTime = "12 PM"
+//                )
+//                reference.child(matchId).setValue(match)
+//            }) {
+//                Text(text = "Add")
+//            }
             if (matchesState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -76,7 +77,7 @@ fun MatchScreen(
                 onRefresh = { matchesViewModel.getAllMatches() }
             ) {
                 if (matchesList != null) {
-                    LazyColumn {
+                    LazyColumn(reverseLayout = true) {
                         items(matchesList) { match ->
                             MatchesListItem(match = match)
                         }
