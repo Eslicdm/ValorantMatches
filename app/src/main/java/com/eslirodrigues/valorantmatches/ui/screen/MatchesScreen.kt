@@ -99,7 +99,6 @@ fun MatchesTopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
             if (showSearchBar.value) {
-                matchesViewModel.isSearchStarting = true
                 Row(modifier = Modifier.fillMaxWidth()) {
                     TextField(
                         modifier = Modifier
@@ -108,7 +107,7 @@ fun MatchesTopAppBar(
                         value = inputTextSearch.value,
                         onValueChange = {
                             inputTextSearch.value = it
-                            matchesViewModel.searchFruitList(it)
+                            matchesViewModel.searchTeams(it)
                         },
                         label = {
                             Text(text = stringResource(id = R.string.search))
@@ -124,7 +123,6 @@ fun MatchesTopAppBar(
                     )
                     IconButton(
                         onClick = {
-                            matchesViewModel.getAllMatches()
                             showSearchBar.value = false
                                   },
                         modifier = Modifier.align(Alignment.CenterVertically)
@@ -135,13 +133,10 @@ fun MatchesTopAppBar(
                         )
                     }
                     BackHandler {
-                        matchesViewModel.getAllMatches()
                         showSearchBar.value = false
                     }
                 }
             } else {
-                matchesViewModel.isSearchStarting = false
-                inputTextSearch.value = ""
                 IconButton(onClick = { showSearchBar.value = true }) {
                     Icon(
                         imageVector = Icons.Default.Search,
