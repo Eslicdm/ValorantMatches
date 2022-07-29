@@ -1,6 +1,8 @@
 package com.eslirodrigues.valorantmatches.ui.screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,11 +14,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eslirodrigues.valorantmatches.R
-import com.eslirodrigues.valorantmatches.data.model.Matches
 import com.eslirodrigues.valorantmatches.ui.viewmodel.MatchesViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -24,7 +27,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Destination(start = true)
 @Composable
 fun MatchScreen(
@@ -77,9 +80,23 @@ fun MatchScreen(
                 onRefresh = { matchesViewModel.getAllMatches() }
             ) {
                 if (matchesList != null) {
-                    LazyColumn(reverseLayout = true) {
-                        items(matchesList) { match ->
-                            MatchesListItem(match = match)
+                    LazyColumn(Modifier.fillMaxSize()) {
+                        val listGroup = matchesList.groupBy { item -> item.tourName }
+
+                        listGroup.forEach { (header, groupItems) ->
+                            stickyHeader {
+                                Text(
+                                    text = header,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .padding(10.dp),
+                                    color = Color.White
+                                )
+                            }
+                            items(groupItems) { match ->
+                                MatchesListItem(match = match)
+                            }
                         }
                     }
                 }
