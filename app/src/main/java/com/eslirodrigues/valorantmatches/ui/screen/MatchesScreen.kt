@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eslirodrigues.valorantmatches.R
+import com.eslirodrigues.valorantmatches.data.model.Matches
 import com.eslirodrigues.valorantmatches.ui.viewmodel.MatchesViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -80,23 +81,19 @@ fun MatchScreen(
                 onRefresh = { matchesViewModel.getAllMatches() }
             ) {
                 if (matchesList != null) {
-                    LazyColumn(Modifier.fillMaxSize()) {
-                        val listGroup = matchesList.groupBy { item -> item.tourName }
-
-                        listGroup.forEach { (header, groupItems) ->
-                            stickyHeader {
-                                Text(
-                                    text = header,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
-                                        .padding(10.dp),
-                                    color = Color.White
-                                )
-                            }
-                            items(groupItems) { match ->
-                                MatchesListItem(match = match)
-                            }
+                    val recentTourName = matchesList.groupBy { group -> group.tourName }.keys.last()
+                    val filteredList = matchesList.filter { item -> item.tourName == recentTourName }
+                    Text(
+                        text = recentTourName,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(10.dp),
+                        color = Color.White
+                    )
+                    LazyColumn(Modifier.fillMaxSize().padding(top = 35.dp)) {
+                        items(filteredList) { match ->
+                            MatchesListItem(match = match)
                         }
                     }
                 }
