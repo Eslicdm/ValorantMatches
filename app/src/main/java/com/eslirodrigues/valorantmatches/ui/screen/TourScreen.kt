@@ -1,72 +1,67 @@
 package com.eslirodrigues.valorantmatches.ui.screen
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.eslirodrigues.valorantmatches.R
-import com.eslirodrigues.valorantmatches.data.model.Matches
 import com.eslirodrigues.valorantmatches.ui.components.DrawerContent
 import com.eslirodrigues.valorantmatches.ui.components.MatchesRefreshList
 import com.eslirodrigues.valorantmatches.ui.components.MatchesTopAppBar
 import com.eslirodrigues.valorantmatches.ui.components.NavDrawer
 import com.eslirodrigues.valorantmatches.ui.navigation.NavRoute
 import com.eslirodrigues.valorantmatches.ui.viewmodel.MatchesViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MatchesScreen(
+fun TourScreen(
     navController: NavController,
-    matchesViewModel: MatchesViewModel = hiltViewModel()
+    tourName: String,
+    lastTourName: String,
+    matchesViewModel: MatchesViewModel = hiltViewModel(),
 ) {
-    val matchesState by matchesViewModel.matchesState.collectAsState()
+    LaunchedEffect(Unit) {
+        matchesViewModel.navTourName = tourName
+    }
 
-    val lastTourName = matchesState.lastTourName ?: ""
-    val lastTourList = matchesState.lastTourList ?: emptyList()
+    val navTourState by matchesViewModel.matchesState.collectAsState()
+
+    val navTourList = navTourState.navTourList ?: emptyList()
 
     val showSearchBar = remember { mutableStateOf(false) }
     val inputTextSearch = remember { mutableStateOf("") }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val drawerItemList = matchesState.drawerItemList ?: emptyList()
+
+    val drawerItemList = navTourState.drawerItemList ?: emptyList()
 
     NavDrawer(
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(
                 itemsList = drawerItemList,
-                currentItem = lastTourName,
+                currentItem = tourName,
                 onItemClick = { navItem ->
                     when {
-                        navItem != lastTourName -> navController.navigate(NavRoute.TourScreen.withArgs(navItem, lastTourName))
+                        navItem != lastTourName && navItem != tourName-> navController.navigate(NavRoute.TourScreen.withArgs(navItem, lastTourName))
+                        navItem == lastTourName -> navController.navigate(NavRoute.MatchesScreen.route)
+                        navItem == tourName -> scope.launch { drawerState.close() }
                     }
-                    scope.launch { drawerState.close() }
                 }
             )
         }
@@ -84,42 +79,33 @@ fun MatchesScreen(
                     }
                 )
             },
+            bottomBar = {
+                AndroidView(factory = {
+                    AdView(it).apply {
+                        setAdSize(AdSize.FLUID)
+                    }
+                })
+            }
         ) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(it),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-//            Button(onClick = {
-//                val reference = Firebase.database.getReference("matches")
-//                val matchId = reference.push().key!!
-//                val match = Matches(
-//                    id = matchId,
-//                    nameTeamA = "XIA",
-//                    imgTeamA = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644381233726_XERXIAPINK.png",
-//                    scoreTeamA = "0",
-//                    nameTeamB = "FPX",
-//                    imgTeamB = "https://am-a.akamaihd.net/image?resize=150:150&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644542485597_download38.png",
-//                    scoreTeamB = "0",
-//                    matchDay = "July 11",
-//                    matchTime = "12 PM"
-//                )
-//                reference.child(matchId).setValue(match)
-//            }) {
-//                Text(text = "Add")
-//            }
                 when {
-                    matchesState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    lastTourList.isEmpty() && !matchesState.isLoading && !showSearchBar.value -> {
-                        Text(text = matchesState.errorMsg ?: stringResource(id = R.string.refresh))
+                    navTourState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    navTourList.isEmpty() && !navTourState.isLoading && !showSearchBar.value -> {
+                        Text(text = navTourState.errorMsg ?: stringResource(id = R.string.refresh))
                         IconButton(onClick = { matchesViewModel.getAllMatches() }) {
                             Icon(Icons.Default.Refresh, contentDescription = stringResource(id = R.string.refresh))
                         }
                     }
-                    lastTourList.isNotEmpty() -> {
+                    navTourList.isNotEmpty() -> {
                         MatchesRefreshList(
-                            tourName = lastTourName,
-                            matchesList = lastTourList,
+                            tourName = tourName,
+                            matchesList = navTourList,
                             onRefresh = { matchesViewModel.getAllMatches() }
                         )
                     }
