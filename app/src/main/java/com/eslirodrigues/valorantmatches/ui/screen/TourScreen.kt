@@ -1,5 +1,6 @@
 package com.eslirodrigues.valorantmatches.ui.screen
 
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,19 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.eslirodrigues.valorantmatches.R
-import com.eslirodrigues.valorantmatches.ui.components.DrawerContent
-import com.eslirodrigues.valorantmatches.ui.components.MatchesRefreshList
-import com.eslirodrigues.valorantmatches.ui.components.MatchesTopAppBar
-import com.eslirodrigues.valorantmatches.ui.components.NavDrawer
+import com.eslirodrigues.valorantmatches.ui.components.*
 import com.eslirodrigues.valorantmatches.ui.navigation.NavRoute
 import com.eslirodrigues.valorantmatches.ui.viewmodel.MatchesViewModel
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +46,14 @@ fun TourScreen(
 
     val drawerItemList = navTourState.drawerItemList ?: emptyList()
 
+    val scrollState = rememberTopAppBarScrollState()
+    val decayAnim = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = remember {
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+            decayAnimationSpec = decayAnim,
+            state = scrollState
+        )
+    }
     NavDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -67,6 +71,7 @@ fun TourScreen(
         }
     ) {
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 MatchesTopAppBar(
                     showSearchBar = showSearchBar,
@@ -76,16 +81,11 @@ fun TourScreen(
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "menu")
                         }
-                    }
+                    },
+                    scrollBehavior = scrollBehavior
                 )
             },
-            bottomBar = {
-                AndroidView(factory = {
-                    AdView(it).apply {
-                        setAdSize(AdSize.FLUID)
-                    }
-                })
-            }
+            bottomBar = { AdMobBanner() }
         ) {
             Column(
                 modifier = Modifier

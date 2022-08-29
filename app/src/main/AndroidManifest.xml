@@ -17,6 +17,7 @@
         android:theme="@style/Theme.ValorantMatches"
         tools:targetApi="31">
         <activity
+            android:hardwareAccelerated="true"
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.ValorantMatches">
@@ -33,6 +34,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5583973029094819~9232883141"/>
     </application>
 
 </manifest>

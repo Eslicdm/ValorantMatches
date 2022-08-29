@@ -4,4 +4,6 @@
     <string name="show_result">Show result</string>
     <string name="search">Search</string>
     <string name="back">Back</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5583973029094819/3294160751</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-5583973029094819/4836665497</string>
 </resources>

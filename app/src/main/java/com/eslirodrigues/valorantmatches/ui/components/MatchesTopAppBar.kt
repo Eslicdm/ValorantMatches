@@ -22,7 +22,8 @@ fun MatchesTopAppBar(
     showSearchBar: MutableState<Boolean>,
     inputTextSearch: MutableState<String>,
     matchesViewModel: MatchesViewModel,
-    navigationIcon: @Composable () -> Unit = {}
+    navigationIcon: @Composable () -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     SmallTopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -30,6 +31,7 @@ fun MatchesTopAppBar(
         navigationIcon = {
             navigationIcon()
         },
+        scrollBehavior = scrollBehavior,
         actions = {
             if (showSearchBar.value) {
                 Row(modifier = Modifier.fillMaxWidth()) {

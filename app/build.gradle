@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.eslirodrigues.valorantmatches"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -63,6 +63,12 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    // Admob
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
+
+    // Nav Animation
+    implementation "com.google.accompanist:accompanist-navigation-animation:0.26.1-alpha"
 
     // Firebase
     implementation 'com.google.firebase:firebase-database-ktx:20.0.5'
