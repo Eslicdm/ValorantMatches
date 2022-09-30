@@ -15,7 +15,8 @@ class MatchesFirebase {
     private val database = Firebase.database
     private val matchesReference = database.getReference("matches")
 
-    suspend fun getAllMatches() : Result<List<Matches>> {
+    suspend fun getAllMatches() : Result<List<Matches>> = withContext(Dispatchers.IO) {
+        Result.Loading
         val matchList = mutableListOf<Matches>()
         var errorMsg: String? = null
         matchesReference.keepSynced(true)
@@ -34,12 +35,10 @@ class MatchesFirebase {
         })
         if (matchList.isEmpty()) delay(700L)
 
-        return withContext(Dispatchers.IO) {
-            if (matchList.isNotEmpty()) {
-                Result.Success(matchList)
-            } else {
-                Result.Error(Throwable(if (errorMsg.isNullOrEmpty()) "Not found" else errorMsg))
-            }
+        if (matchList.isNotEmpty()) {
+            Result.Success(matchList)
+        } else {
+            Result.Error(Throwable(if (errorMsg.isNullOrEmpty()) "Not found" else errorMsg))
         }
     }
 }

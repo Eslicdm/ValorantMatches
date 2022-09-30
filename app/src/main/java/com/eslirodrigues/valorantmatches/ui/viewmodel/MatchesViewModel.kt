@@ -101,6 +101,9 @@ class MatchesViewModel @Inject constructor(
             is Result.Error -> {
                 _matchesState.update { it.copy(isLoading = false, errorMsg = result.exception.message) }
             }
+            is Result.Loading -> {
+                _matchesState.update { it.copy(isLoading = true) }
+            }
         }
     }
 }
