@@ -43,8 +43,6 @@ class MatchesViewModel @Inject constructor(
                 drawerItemList = drawerItemList,
                 lastTourList = lastTourList,
                 lastTourName = lastTourName,
-                navTourList = null,
-                navTourName = null
             )
         }
     }
@@ -58,7 +56,6 @@ class MatchesViewModel @Inject constructor(
                 errorMsg = null,
                 isLoading = false,
                 drawerItemList = drawerItemList,
-                lastTourList = null,
                 lastTourName = lastTourName,
                 navTourList = navTourList,
                 navTourName = navTourName
@@ -93,16 +90,18 @@ class MatchesViewModel @Inject constructor(
 
     fun getAllMatches() = viewModelScope.launch {
         _matchesState.update { it.copy(isLoading = true) }
-        when (val result = repository.getAllMatches()) {
-            is Result.Success -> {
-                initialMatchesList = result.data
-                if (navTourName.isEmpty()) { setupLastTourList() } else { setupNavTourWithString() }
-            }
-            is Result.Error -> {
-                _matchesState.update { it.copy(isLoading = false, errorMsg = result.exception.message) }
-            }
-            is Result.Loading -> {
-                _matchesState.update { it.copy(isLoading = true) }
+        repository.getAllMatches().collect { result ->
+            when (result) {
+                is Result.Success -> {
+                    initialMatchesList = result.data.filterNotNull()
+                    if (navTourName.isEmpty()) { setupLastTourList() } else { setupNavTourWithString() }
+                }
+                is Result.Error -> {
+                    _matchesState.update { it.copy(isLoading = false, errorMsg = result.exception.message) }
+                }
+                is Result.Loading -> {
+                    _matchesState.update { it.copy(isLoading = true) }
+                }
             }
         }
     }

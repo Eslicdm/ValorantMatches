@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.eslirodrigues.valorantmatches.R
 import com.eslirodrigues.valorantmatches.ui.viewmodel.MatchesViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchesTopAppBar(
     showSearchBar: MutableState<Boolean>,
@@ -25,8 +26,8 @@ fun MatchesTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
-    SmallTopAppBar(
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         title = { Text(text = stringResource(id = R.string.app_name)) },
         navigationIcon = {
             navigationIcon()

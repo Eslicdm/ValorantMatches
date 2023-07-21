@@ -18,25 +18,19 @@ import com.eslirodrigues.valorantmatches.data.model.Matches
 
 @Composable
 fun MatchesListItem(match: Matches) {
-    var isRevealed by remember { mutableStateOf(false) }
-
-    Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-        Text(text = if (match.matchTime.isEmpty()) match.matchDay else "${match.matchDay} \n ${match.matchTime}")
-        AsyncImage(
-            model = match.imgTeamA,
-            contentDescription = match.nameTeamA
-        )
-        Text(text = if (isRevealed) match.scoreTeamA else "?")
-        Text(text = " - ")
-        Text(text = if (isRevealed) match.scoreTeamB else "?")
-        AsyncImage(
-            model = match.imgTeamB,
-            contentDescription = match.nameTeamB
-        )
-        IconToggleButton(checked = isRevealed, onCheckedChange = { isRevealed = !isRevealed }) {
-            Icon(
-                imageVector = if (isRevealed) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                contentDescription = stringResource(id = R.string.show_result))
-        }   
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(text = match.matchDay)
+            Text(text = match.matchTime)
+        }
+        AsyncImage(model = match.imgTeamA, contentDescription = match.nameTeamA)
+        Text(text = "${match.scoreTeamA} - ${match.scoreTeamB}")
+        AsyncImage(model = match.imgTeamB, contentDescription = match.nameTeamB)
     }
 }

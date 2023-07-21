@@ -6,39 +6,32 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class MatchesFirebase {
     private val database = Firebase.database
     private val matchesReference = database.getReference("matches")
 
-    suspend fun getAllMatches() : Result<List<Matches>> = withContext(Dispatchers.IO) {
-        Result.Loading
-        val matchList = mutableListOf<Matches>()
-        var errorMsg: String? = null
+    suspend fun getAllMatches() : Flow<Result<List<Matches>>> = callbackFlow {
+        trySend(Result.Loading)
         matchesReference.keepSynced(true)
-        matchesReference.addValueEventListener(object : ValueEventListener {
+        val event = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.map { ds ->
-                    ds.getValue(Matches::class.java)?.copy(id = ds.key!!)
-                }.forEach { match ->
-                    if (match != null) matchList.add(match)
+                val matches = snapshot.children.mapNotNull { dataSnapshot ->
+                    dataSnapshot.getValue(Matches::class.java)
                 }
+                trySend(Result.Success(matches))
             }
 
             override fun onCancelled(error: DatabaseError) {
-                errorMsg = error.message
+                trySend(Result.Error(Throwable("Not Found")))
             }
-        })
-        if (matchList.isEmpty()) delay(700L)
-
-        if (matchList.isNotEmpty()) {
-            Result.Success(matchList)
-        } else {
-            Result.Error(Throwable(if (errorMsg.isNullOrEmpty()) "Not found" else errorMsg))
         }
+        matchesReference.addValueEventListener(event)
+        awaitClose { close() }
     }
 }

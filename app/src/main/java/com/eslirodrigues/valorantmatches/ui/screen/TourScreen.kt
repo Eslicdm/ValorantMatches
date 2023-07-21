@@ -1,6 +1,5 @@
 package com.eslirodrigues.valorantmatches.ui.screen
 
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.eslirodrigues.valorantmatches.R
 import com.eslirodrigues.valorantmatches.ui.components.*
@@ -34,9 +34,7 @@ fun TourScreen(
         matchesViewModel.navTourName = tourName
     }
 
-    val navTourState by matchesViewModel.matchesState.collectAsState()
-
-    val navTourList = navTourState.navTourList ?: emptyList()
+    val navTourState by matchesViewModel.matchesState.collectAsStateWithLifecycle()
 
     val showSearchBar = remember { mutableStateOf(false) }
     val inputTextSearch = remember { mutableStateOf("") }
@@ -44,30 +42,23 @@ fun TourScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val drawerItemList = navTourState.drawerItemList ?: emptyList()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    val scrollState = rememberTopAppBarScrollState()
-    val decayAnim = rememberSplineBasedDecay<Float>()
-    val scrollBehavior = remember {
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-            decayAnimationSpec = decayAnim,
-            state = scrollState
-        )
-    }
     NavDrawer(
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(
-                itemsList = drawerItemList,
-                currentItem = tourName,
-                onItemClick = { navItem ->
-                    when {
-                        navItem != lastTourName && navItem != tourName-> navController.navigate(NavRoute.TourScreen.withArgs(navItem, lastTourName))
-                        navItem == lastTourName -> navController.navigate(NavRoute.MatchesScreen.route)
-                        navItem == tourName -> scope.launch { drawerState.close() }
-                    }
+                itemsList = navTourState.drawerItemList,
+                currentItem = tourName
+            ) { navItem ->
+                when {
+                    navItem != lastTourName && navItem != tourName -> navController.navigate(
+                        NavRoute.TourScreen.withArgs(navItem, lastTourName)
+                    )
+                    navItem == lastTourName -> navController.navigate(NavRoute.MatchesScreen.route)
+                    else -> scope.launch { drawerState.close() }
                 }
-            )
+            }
         }
     ) {
         Scaffold(
@@ -96,16 +87,16 @@ fun TourScreen(
             ) {
                 when {
                     navTourState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    navTourList.isEmpty() && !navTourState.isLoading && !showSearchBar.value -> {
+                    navTourState.navTourList.isEmpty() && !navTourState.isLoading && !showSearchBar.value -> {
                         Text(text = navTourState.errorMsg ?: stringResource(id = R.string.refresh))
                         IconButton(onClick = { matchesViewModel.getAllMatches() }) {
                             Icon(Icons.Default.Refresh, contentDescription = stringResource(id = R.string.refresh))
                         }
                     }
-                    navTourList.isNotEmpty() -> {
+                    navTourState.navTourList.isNotEmpty() -> {
                         MatchesRefreshList(
                             tourName = tourName,
-                            matchesList = navTourList,
+                            matchesList = navTourState.navTourList,
                             onRefresh = { matchesViewModel.getAllMatches() }
                         )
                     }

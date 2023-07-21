@@ -14,18 +14,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavDrawer(
     drawerState: DrawerState,
-    drawerContent: @Composable ColumnScope.() -> Unit,
+    drawerContent: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            drawerContent()
-        },
+        drawerContent = { drawerContent() }
     ) {
         content()
     }
@@ -34,34 +31,19 @@ fun NavDrawer(
 
 @Composable
 fun DrawerContent(
-    itemsList: Collection<String>,
+    itemsList: List<String>,
     currentItem: String,
     onItemClick: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Black)
-            .padding(12.dp),
-    ) {
-
-        itemsList.forEach { navDrawerItem ->
-            val backgroundColor = if (navDrawerItem == currentItem) MaterialTheme.colorScheme.onPrimaryContainer else Color.Transparent
-            val textIconColor = if (navDrawerItem == currentItem) MaterialTheme.colorScheme.primary else Color.LightGray
-            TextButton(
-                modifier = Modifier
-                    .background(backgroundColor, shape = CircleShape)
-                    .padding(vertical = 8.dp),
-                onClick = {
-                    onItemClick(navDrawerItem)
-                }
-            ) {
-                Text(
-                    text = navDrawerItem,
-                    fontSize = 16.sp, color = textIconColor,
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+    ModalDrawerSheet {
+        Column(modifier = Modifier.fillMaxWidth().background(Color.Black).padding(12.dp)) {
+            itemsList.forEach { navDrawerItem ->
+                NavigationDrawerItem(
+                    label = {
+                        Text(text = navDrawerItem, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    },
+                    selected = navDrawerItem == currentItem,
+                    onClick = { onItemClick(navDrawerItem) }
                 )
             }
         }
